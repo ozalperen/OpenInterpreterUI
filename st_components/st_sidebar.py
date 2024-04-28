@@ -10,6 +10,7 @@ from streamlit_extras.add_vertical_space import add_vertical_space
 from st_components.st_conversations import conversation_navigation
 
 import os
+INTERPRETER_DIR = os.path.join(os.getcwd(), 'interpreter')
 
 OPEN_AI = 'LLMProxy'
 AZURE_OPEN_AI = 'Azure OpenAI'
@@ -37,11 +38,11 @@ def st_sidebar():
         # elif api_server == OPEN_AI_MOCK:
         #     st.warning('under construction')
 
+        # file upload and delete
+        file_handling()
+
         # Section dedicated to navigate conversations
         conversation_navigation()
-
-        # Upload file
-        upload_file()
 
         # Section dedicated to About Us
         about_us()
@@ -61,17 +62,33 @@ def about_us():
     html_chat = '<center><h5>The CereAI Code Interpreter runs code on a sandbox environment connected to the Internet. Make sure to use it responsibly on production envidonments.</h5>'
     st.markdown(html_chat, unsafe_allow_html=True)
 
+
 # Upload file
 
 
-def upload_file():
-    uploaded_files = st.file_uploader(
-        "Choose a CSV file", accept_multiple_files=True)
-    for uploaded_file in uploaded_files:
-        # save file to disk
-        with open(uploaded_file.name, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        st.success(f"Saved file: {uploaded_file.name}")
+#  List files in directory
+def file_handling():
+    with st.expander(label="Documents", expanded=(st.session_state['chat_ready'])):
+        uploaded_files = st.file_uploader(
+            "Choose a CSV file", accept_multiple_files=True)
+        for uploaded_file in uploaded_files:
+            # save file to disk
+            file_path = os.path.join(INTERPRETER_DIR, uploaded_file.name)
+            with open(file_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            st.success(f"Saved file: {uploaded_file.name}")
+
+        st.write('List of files in the directory:')
+        for filename in os.listdir(INTERPRETER_DIR):
+            st.write(filename)
+        # chek if folder is empty
+        if not os.listdir(INTERPRETER_DIR):
+            st.write('No files in the directory')
+        else:
+            if st.button(f"Delete All Files"):
+                for filename in os.listdir(INTERPRETER_DIR):
+                    os.remove(f'{INTERPRETER_DIR}/{filename}')
+                    st.success(f"{filename} has been deleted!")
 
 
 # Setup OpenAI
@@ -98,7 +115,7 @@ def set_open_ai_credentials():
 
         button_container = st.empty()
         save_button = button_container.button(
-            "Save Changes 🚀", key='open_ai_save_model_configs')
+            "Start Chat 🚀", key='open_ai_save_model_configs')
 
         if save_button and openai_key:
             os.environ["OPENAI_API_KEY"] = openai_key

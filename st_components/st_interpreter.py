@@ -1,13 +1,15 @@
 import streamlit as st
 import os
 
+INTERPRETER_DIR = os.path.join(os.getcwd(), 'interpreter')
+
 
 def setup_interpreter():
     try:
         st.session_state['interpreter'].reset()
     except:
         pass
-
+    os.chdir(INTERPRETER_DIR)
     st.session_state['interpreter'].conversation_filename = st.session_state['current_conversation']["id"]
     st.session_state['interpreter'].conversation_history = True
     st.session_state['interpreter'].messages = st.session_state.get(
