@@ -9,24 +9,34 @@ from src.data.models import Conversation
 import uuid
 
 
-
 def st_main():
-        
+    st.markdown("""
+    <style>
+        .reportview-container {
+            margin-top: -2em;
+        }
+        #MainMenu {visibility: hidden;}
+        .stDeployButton {display:none;}
+        footer {visibility: hidden;}
+        #stDecoration {display:none;}
+    </style>
+""", unsafe_allow_html=True)
     # try:
-        if not st.session_state['chat_ready']:
-            
-            introduction()
-        
-        else:    
+    if not st.session_state['chat_ready']:
 
-            create_or_get_current_conversation()
+        introduction()
 
-            render_messages()
-            
-            chat_with_interpreter()
-    
+    else:
+
+        create_or_get_current_conversation()
+
+        render_messages()
+
+        chat_with_interpreter()
+
     # except Exception as e:
     #     st.error(e)
+
 
 def create_or_get_current_conversation():
     if 'current_conversation' not in st.session_state:
@@ -35,13 +45,16 @@ def create_or_get_current_conversation():
             st.session_state['current_conversation'] = conversations[0]
         else:
             conversation_id = str(uuid.uuid4())
-            new_conversation = Conversation(conversation_id, st.session_state.user_id, f"Conversation {len(conversations)}")
+            new_conversation = Conversation(
+                conversation_id, st.session_state.user_id, f"Conversation {len(conversations)}")
             save_conversation(new_conversation)
             st.session_state['current_conversation'] = new_conversation
             st.session_state["messages"] = []
             st.rerun()
     else:
-        st.session_state.messages = get_chats_by_conversation_id(st.session_state['current_conversation']["id"])
+        st.session_state.messages = get_chats_by_conversation_id(
+            st.session_state['current_conversation']["id"])
+
 
 def render_messages():
     """
@@ -50,9 +63,11 @@ def render_messages():
     """
     for msg in st.session_state.messages:
         if msg["role"] == "user":
-            st.chat_message(msg["role"]).markdown(f'<p>{msg["content"]}</p>', True)
+            st.chat_message(msg["role"]).markdown(
+                f'<p>{msg["content"]}</p>', True)
         elif msg["role"] == "assistant":
             st.chat_message(msg["role"]).markdown(msg["content"])
+
 
 def introduction():
     """
@@ -60,5 +75,4 @@ def introduction():
     Display introductory messages for the user.
     """
     st.info("👋 Hey, we're very happy to see you here. 🤗")
-    st.info("👉 Set your OpenAI api key, to be able to run code while you generate it 🚀")
-    st.error("👉 The objective of this project is to show an easy implementation of the use of Open Interpreter 🤗")
+    st.info("👉 Select the model from the left panel to be able to run code while you generate it 🚀")
