@@ -8,13 +8,13 @@ from st_components.st_session_states import init_session_states
 from st_components.st_sidebar import st_sidebar
 from st_components.st_main import st_main
 
-#validation
+# validation
 from litellm import completion
 from openai import Model
 
 set_style()
 
-st.title("💬 Open Interpreter")
+st.title("CereAI Code Interpreter")
 
 init_session_states()
 
