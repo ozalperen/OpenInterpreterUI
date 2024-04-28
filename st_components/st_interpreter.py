@@ -1,16 +1,18 @@
 import streamlit as st
+import os
+
 
 def setup_interpreter():
     try:
         st.session_state['interpreter'].reset()
     except:
         pass
-        
+
     st.session_state['interpreter'].conversation_filename = st.session_state['current_conversation']["id"]
     st.session_state['interpreter'].conversation_history = True
     st.session_state['interpreter'].messages = st.session_state.get(
         'messages',
-        st.session_state.get('mensajes',[])
+        st.session_state.get('mensajes', [])
     )
     st.session_state['interpreter'].llm.model = st.session_state['model']
     st.session_state['interpreter'].llm.temperature = st.session_state['temperature']
@@ -26,6 +28,7 @@ def setup_interpreter():
     elif st.session_state['api_choice'] == 'openai':
         st.session_state['interpreter'].llm.api_key = st.session_state['openai_key']
         st.session_state['interpreter'].llm.context_window = st.session_state['context_window']
+        st.session_state['interpreter'].llm.api_base = os.environ['OPENAI_API_BASE']
     elif st.session_state['api_choice'] == 'azure_openai':
         st.session_state['interpreter'].llm.api_key = st.session_state['openai_key']
         st.session_state['interpreter'].llm.api_base = st.session_state['azure_endpoint']
@@ -35,13 +38,18 @@ def setup_interpreter():
     elif st.session_state['api_choice'] == 'local':
         st.session_state['interpreter'].llm.context_window = st.session_state['context_window']
         st.session_state['interpreter'].offline = True
-        if st.session_state['provider']=='Lmstudio':
-            st.session_state['interpreter'].llm.model = "openai/x" # Tells OI to send messages in OpenAI's format
-            st.session_state['interpreter'].llm.api_key = "fake_key" # LiteLLM, which we use to talk to LM Studio, requires this
-            st.session_state['interpreter'].llm.api_base = st.session_state.get('api_base') # Point this at any OpenAI compatible server
+        if st.session_state['provider'] == 'Lmstudio':
+            # Tells OI to send messages in OpenAI's format
+            st.session_state['interpreter'].llm.model = "openai/x"
+            # LiteLLM, which we use to talk to LM Studio, requires this
+            st.session_state['interpreter'].llm.api_key = "fake_key"
+            st.session_state['interpreter'].llm.api_base = st.session_state.get(
+                'api_base')  # Point this at any OpenAI compatible server
         else:
-            st.session_state['interpreter'].llm.model = f"ollama_chat/{st.session_state.get('model')}"
-            st.session_state['interpreter'].llm.api_base = st.session_state.get('api_base')
+            st.session_state[
+                'interpreter'].llm.model = f"ollama_chat/{st.session_state.get('model')}"
+            st.session_state['interpreter'].llm.api_base = st.session_state.get(
+                'api_base')
 
     # Debug
     # st.write(interpreter.__dict__)
