@@ -94,7 +94,7 @@ def format_response(chunk, full_response):
         if chunk.get('format', '') == "active_line":
             console_content = chunk.get('content', '')
             if console_content is None:
-               full_response += "No output available on console."
+                full_response += "No output available on console."
         if chunk.get('format', '') == "output":
             console_content = chunk.get('content', '')
             full_response += console_content
