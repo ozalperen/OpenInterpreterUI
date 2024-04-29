@@ -69,6 +69,8 @@ def about_us():
 #  List files in directory
 def file_handling():
     with st.expander(label="Documents", expanded=(st.session_state['chat_ready'])):
+        st.markdown("<h4>Upload Files:", unsafe_allow_html=True)
+        add_vertical_space(1)
         uploaded_files = st.file_uploader(
             "Choose a CSV file", accept_multiple_files=True)
         for uploaded_file in uploaded_files:
@@ -78,7 +80,9 @@ def file_handling():
                 f.write(uploaded_file.getbuffer())
             st.success(f"Saved file: {uploaded_file.name}")
 
-        st.write('List of files in the directory:')
+        add_vertical_space(2)
+        st.markdown("<h4>Loaded Documents:", unsafe_allow_html=True)
+        add_vertical_space(1)
         for filename in os.listdir(INTERPRETER_DIR):
             st.write(filename)
         # chek if folder is empty
@@ -89,7 +93,19 @@ def file_handling():
                 for filename in os.listdir(INTERPRETER_DIR):
                     os.remove(f'{INTERPRETER_DIR}/{filename}')
                     st.success(f"{filename} has been deleted!")
-
+            # download selected file
+            st.markdown("<h4>Download Files:", unsafe_allow_html=True)
+            add_vertical_space(1)
+            # select a file to download
+            file_to_download = st.selectbox(
+                "Select a file", os.listdir(INTERPRETER_DIR))
+            # download button
+            st.download_button(
+                label="Download file",
+                data=open(f"{INTERPRETER_DIR}/{file_to_download}",
+                          "rb").read(),
+                file_name=file_to_download
+            )
 
 # Setup OpenAI
 
@@ -106,9 +122,9 @@ def set_open_ai_credentials():
         context_window = st.session_state['models']['openai'][model]['context_window']
 
         temperature = st.slider('🌡 Tempeture', min_value=0.01, max_value=1.0,
-                                value=st.session_state.get('temperature', 0.2), step=0.01)
-        max_tokens = st.slider('📝 Max tokens', min_value=1, max_value=2000,
-                               value=st.session_state.get('max_tokens', 1024), step=1)
+                                value=st.session_state.get('temperature', 0.1), step=0.01)
+        max_tokens = st.slider('📝 Max tokens', min_value=1, max_value=4000,
+                               value=st.session_state.get('max_tokens', 3000), step=1)
 
         num_pair_messages_recall = st.slider(
             '**Memory Size**: user-assistant message pairs', min_value=1, max_value=10, value=7)
