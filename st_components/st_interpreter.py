@@ -19,7 +19,7 @@ def setup_interpreter():
     st.session_state['interpreter'].llm.model = st.session_state['model']
     st.session_state['interpreter'].llm.temperature = st.session_state['temperature']
     st.session_state['interpreter'].llm.max_tokens = st.session_state['max_tokens']
-    st.session_state['interpreter'].llm.system_message = st.session_state['system_message']
+    st.session_state['interpreter'].custom_instructions = st.session_state['system_message']
     st.session_state['interpreter'].auto_run = True
 
     st.session_state['interpreter'].computer.emit_images = True
