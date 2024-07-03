@@ -2,14 +2,18 @@ import streamlit as st
 import uuid
 import json
 from interpreter import interpreter
-
+import os
 from src.utils.prompts import PROMPTS
+
+MODEL_PATH = os.path.join(os.getcwd(), 'models.json')
 
 
 def init_session_states():
+    if not os.path.isfile(MODEL_PATH):
+        raise FileNotFoundError(f"No such file: '{MODEL_PATH}'")
 
     if 'models' not in st.session_state:
-        with open("models.json", "r") as file:
+        with open(MODEL_PATH) as file:
             st.session_state['models'] = json.load(file)
     if 'api_choice' not in st.session_state:
         st.session_state['api_choice'] = None
